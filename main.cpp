@@ -2,9 +2,13 @@
 #include <errno.h>
 #include <dirent.h>
 #include <string.h>
+#include <regex>
+#include <iostream>
 #include <vector>
 
-std::vector<char *> getChildrenDir(char * path) {
+const char * PROC_PATH = "/proc";
+
+std::vector<char *> get_children_dir(char * path) {
 
 	std::vector<char *> dirlist;
 
@@ -17,7 +21,7 @@ std::vector<char *> getChildrenDir(char * path) {
 	errno = 0;
 	dirent * entry;
 
-	while ( entry = readdir(dir) )  {
+	while ( (entry = readdir(dir)) )  {
 		dirlist.push_back(entry->d_name);
 	}
 
@@ -34,15 +38,34 @@ std::vector<char *> getChildrenDir(char * path) {
 	return dirlist;
 }
 
+std::vector<char *> get_all_pid_list() {
+
+	std::vector<char *> pid_list;
+	std::vector<char *> proc_entries = get_children_dir( (char *) PROC_PATH );
+
+	std::regex pid_pattern ("^\\d+$");
+
+	for (unsigned int i = 0; i < proc_entries.size(); i++ ) {
+
+		if ( ! std::regex_match(proc_entries[i], pid_pattern) )
+			continue;
+
+		pid_list.push_back(proc_entries[i]);
+	}
+
+	return pid_list;
+}
+
+void treeify(std::vector<char *> pid_list) {
+	return;
+}
+
 int main( int argc, char ** argv) {
 
-	const char * procPath = "/proc";
+	std::vector<char *> pid_list = get_all_pid_list();
 
-	std::vector<char *> list = getChildrenDir((char *) procPath);
+	std::cout << "SIZE: " << pid_list.size();
 
-	for (unsigned int i = 0; i < list.size(); i++ ) {
-		printf("%s\n", list[i]);
-	}
 	return 0;
 }
 
