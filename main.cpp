@@ -12,9 +12,9 @@
 
 #define PROC_PATH "/proc"
 
-std::vector<char *> get_children_dir(const char * path) {
+std::vector<std::string> get_children_dir(const char * path) {
 
-	std::vector<char *> dirlist;
+	std::vector<std::string> dirlist;
 
 	DIR * dir = opendir(path);
 
@@ -42,10 +42,10 @@ std::vector<char *> get_children_dir(const char * path) {
 	return dirlist;
 }
 
-std::vector<char *> get_all_pid_list() {
+std::vector<std::string> get_all_pid_list() {
 
-	std::vector<char *> pid_list;
-	std::vector<char *> proc_entries = get_children_dir( PROC_PATH );
+	std::vector<std::string> pid_list;
+	std::vector<std::string> proc_entries = get_children_dir( PROC_PATH );
 
 	std::regex pid_pattern ("^\\d+$");
 
@@ -61,9 +61,9 @@ std::vector<char *> get_all_pid_list() {
 	return pid_list;
 }
 
-std::vector<char *> get_pid_children_list(std::vector<char *> pid_list, int ppid) {
+std::vector<std::string> get_pid_children_list(std::vector<std::string> pid_list, int ppid) {
 
-	std::vector<char *> pid_children_list;
+	std::vector<std::string> pid_children_list;
 
 	std::ifstream ifs;
 	std::string path;
@@ -79,7 +79,7 @@ std::vector<char *> get_pid_children_list(std::vector<char *> pid_list, int ppid
 	return pid_children_list;
 }
 
-Node treeify(std::vector<char *> pid_list) {
+Node treeify(std::vector<std::string> pid_list) {
 	Node root;
 
 	root.setValue(0);
@@ -87,7 +87,8 @@ Node treeify(std::vector<char *> pid_list) {
 
 	int ppid = 0;
 
-	std::vector<char *> root_list = get_pid_children_list(pid_list, ppid);
+	std::vector<std::string> root_list = get_pid_children_list(pid_list, ppid);
+
 
 //	generate_sub_tree(root, root_list);
 
@@ -96,7 +97,7 @@ Node treeify(std::vector<char *> pid_list) {
 
 int main( int argc, char ** argv) {
 
-	std::vector<char *> pid_list = get_all_pid_list();
+	std::vector<std::string> pid_list = get_all_pid_list();
 
 	Node tree_root = treeify(pid_list);
 
