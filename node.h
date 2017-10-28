@@ -1,16 +1,22 @@
 #include <vector>
+#include <string>
 
 class Node {
 
 	private:
-		int value;
-		std::vector<Node> childrens;
+		std::string value;
+		std::vector<Node *> childrens;
 		Node * parent;
+		unsigned int count;
 
 	public:
-		void addChildren(Node children);
-		void setValue(int value);
+		Node();
+		void addChildren(Node * children);
+		void setValue(std::string value);
 		Node * getParent();
 		void setParent(Node * parent);
+		unsigned int getCount();
+		void doPrint(int level);
+		void doPrint();
 
 };

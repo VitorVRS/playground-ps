@@ -61,37 +61,60 @@ std::vector<std::string> get_all_pid_list() {
 	return pid_list;
 }
 
-std::vector<std::string> get_pid_children_list(std::vector<std::string> pid_list, int ppid) {
+std::vector<std::string> get_pid_children_list(std::vector<std::string> pid_list, unsigned int ppid) {
 
 	std::vector<std::string> pid_children_list;
 
 	std::ifstream ifs;
 	std::string path;
 
+	// SEE: man 5 proc
+	unsigned int process_pid;
+	std::string process_comm;
+	char process_state;
+	unsigned int process_ppid;
+
 	for (unsigned int i = 0; i < pid_list.size(); i++) {
 		// para registro, procurar os pids com ppid igual ao do parametro
 		path = std::string(PROC_PATH) + "/" + pid_list[i] + "/stat";
 		ifs.open(path.c_str());
-		/// TODO
+		ifs >> process_pid >> process_comm >> process_state >> process_ppid;
+
+		if (process_ppid == ppid) {
+			pid_children_list.push_back(pid_list[i]);
+		}
+
 		ifs.close();
 	}
 
 	return pid_children_list;
 }
 
+void generate_sub_tree(Node * node, std::vector<std::string> pid_list, unsigned int ppid) {
+
+	std::vector<std::string> sub_list = get_pid_children_list(pid_list, ppid);
+
+	for (unsigned int i = 0; i < sub_list.size(); i++ ) {
+
+		Node * new_node = new Node();
+		new_node->setValue( sub_list[i] );
+		new_node->setParent(node);
+		node->addChildren(new_node);
+
+		generate_sub_tree(new_node, pid_list, std::stoul(sub_list[i]) );
+	}
+
+}
+
 Node treeify(std::vector<std::string> pid_list) {
 	Node root;
 
-	root.setValue(0);
+	root.setValue("");
 	root.setParent(nullptr);
 
-	int ppid = 0;
+	generate_sub_tree(&root, pid_list, 0);
 
-	std::vector<std::string> root_list = get_pid_children_list(pid_list, ppid);
-
-
-//	generate_sub_tree(root, root_list);
-
+	root.doPrint();
 	return root;
 }
 
@@ -100,6 +123,7 @@ int main( int argc, char ** argv) {
 	std::vector<std::string> pid_list = get_all_pid_list();
 
 	Node tree_root = treeify(pid_list);
+
 
 	return 0;
 }
