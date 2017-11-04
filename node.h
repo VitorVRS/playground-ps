@@ -13,10 +13,8 @@ class Node {
 		Node();
 		void addChildren(Node * children);
 		void setValue(std::string value);
-		Node * getParent();
 		void setParent(Node * parent);
-		unsigned int getCount();
-		void doPrint(int level);
+		void doPrint(unsigned int level);
 		void doPrint();
 
 };

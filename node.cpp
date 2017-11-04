@@ -1,5 +1,6 @@
 #include "node.h"
 #include <iostream>
+#include <utility>
 
 Node::Node() {
 	this->count = 0;
@@ -11,27 +12,19 @@ void Node::addChildren(Node * children) {
 }
 
 void Node::setValue(std::string value) {
-	this->value = value;
-}
-
-Node * Node::getParent() {
-	return this->parent;
+	this->value = std::move(value);
 }
 
 void Node::setParent(Node * parent) {
 	this->parent = parent;
 }
 
-unsigned int Node::getCount() {
-	return this->count;
-}
-
-void Node::doPrint(int level) {
+void Node::doPrint(unsigned int level) {
 
 	std::cout << std::string(level, ' ') << "LEVEL: " << level << " - VALUE: " << this->value <<  "\n";
 
-	for (unsigned int i = 0; i < this->childrens.size(); i++) {
-		this->childrens[i]->doPrint(level+1);
+	for (auto &children : this->childrens) {
+		children->doPrint(level+1);
 	}
 }
 
